@@ -135,7 +135,7 @@ function App() {
 
   return (
     <div
-      className={`w-full h-full bg-gradient-to-br from-pink-100 to-blue-100 p-8 overflow-y-auto ${
+      className={`w-screen h-screen bg-gradient-to-br from-pink-100 to-blue-100 p-8 overflow-y-auto ${
         actuallyAttacking ? "shake" : ""
       }`}
     >
