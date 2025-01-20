@@ -2,6 +2,8 @@
 
 A fun and visually appealing stress testing server with a **Miku-themed** frontend, where you can configure and run attacks while enjoying a banger song in the background! 🎤✨
 
+![Screenshot](docs/screenshot.png)
+
 ## Features 🎉
 
 - 🌐 **Real-time Attack Visualization**: View your attack’s progress and statistics in real-time as it runs. 🔥
