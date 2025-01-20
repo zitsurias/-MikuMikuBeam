@@ -6,6 +6,7 @@ const socket = io("http://localhost:3000");
 
 function App() {
   const [isAttacking, setIsAttacking] = useState(false);
+  const [actuallyAttacking, setActuallyAttacking] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
   const [progress, setProgress] = useState(0);
   const [target, setTarget] = useState("");
@@ -20,7 +21,40 @@ function App() {
   });
   const [lastUpdatedPPS, setLastUpdatedPPS] = useState(Date.now());
   const [lastTotalPackets, setLastTotalPackets] = useState(0);
+  const [currentTask, setCurrentTask] = useState<NodeJS.Timeout | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      const audio = audioRef.current;
+      const handler = () => {
+        if (!audio.paused && audio.currentTime > 17.53) {
+          audio.currentTime = 15.86;
+        }
+      };
+
+      audio.addEventListener("timeupdate", handler);
+      return () => {
+        audio.removeEventListener("timeupdate", handler);
+      };
+    }
+  }, [audioRef]);
+
+  useEffect(() => {
+    if (!isAttacking) {
+      setActuallyAttacking(false);
+
+      const audio = audioRef.current;
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+
+      if (currentTask) {
+        clearTimeout(currentTask);
+      }
+    }
+  }, [isAttacking, currentTask]);
 
   useEffect(() => {
     const now = Date.now();
@@ -81,7 +115,8 @@ function App() {
     }
 
     // Start attack after audio intro
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
+      setActuallyAttacking(true);
       socket.emit("startAttack", {
         target,
         packetSize,
@@ -89,7 +124,8 @@ function App() {
         packetDelay,
         attackMethod,
       });
-    }, 10000);
+    }, 10250);
+    setCurrentTask(timeout);
   };
 
   const stopAttack = () => {
@@ -98,7 +134,11 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-100 to-blue-100 p-8">
+    <div
+      className={`w-full h-full bg-gradient-to-br from-pink-100 to-blue-100 p-8 overflow-y-auto ${
+        actuallyAttacking ? "shake" : ""
+      }`}
+    >
       <audio ref={audioRef} src="/audio.mp3" />
 
       <div className="max-w-2xl mx-auto space-y-8">
