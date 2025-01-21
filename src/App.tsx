@@ -364,7 +364,7 @@ function App() {
           🎵
           </span>
           <span>
-          <input type="range" min="0" max="100" step="5" draggable="false" value={audioVol} onChange={(e) => setAudioVol(parseInt(e.target?.value))} />
+          <input className="shadow-sm volume_bar focus:border-pink-500" type="range" min="0" max="100" step="5" draggable="false" value={audioVol} onChange={(e) => setAudioVol(parseInt(e.target?.value))} />
           </span>
         </div>
       </div>

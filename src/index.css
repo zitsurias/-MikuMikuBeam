@@ -52,3 +52,98 @@ body {
     transform: translate(2px, -4px) rotate(-1deg);
   }
 }
+
+/* styling is done for the volume bar to match the rest of the miku theme. code was generated from: https://danielstern.ca/range.css/?ref=css-tricks#/ and background was replaced with linear-gradient */
+input[type=range].volume_bar {
+  width: 100%;
+  margin: 5px 0;
+  background-color: transparent;
+  -webkit-appearance: none;
+}
+input[type=range].volume_bar:focus {
+  outline: none;
+}
+input[type=range].volume_bar::-webkit-slider-runnable-track {
+  background: linear-gradient(to bottom right, rgba(236, 72, 153, 1), rgba(59, 130, 246, 1));
+  border: 0;
+  border-radius: 25px;
+  width: 100%;
+  height: 5px;
+  cursor: pointer;
+}
+input[type=range].volume_bar::-webkit-slider-thumb {
+  margin-top: -5px;
+  width: 20px;
+  height: 15px;
+  background: rgba(6, 182, 212, 0.93);
+  border: 1px solid #0891b2;
+  border-radius: 50px;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+input[type=range].volume_bar:focus::-webkit-slider-runnable-track {
+  background: linear-gradient(to bottom right, rgba(236, 72, 153, 1), rgba(59, 130, 246, 1));
+}
+input[type=range].volume_bar::-moz-range-track {
+  background: linear-gradient(to bottom right, rgba(236, 72, 153, 1), rgba(59, 130, 246, 1));
+
+  border: 0;
+  border-radius: 25px;
+  width: 100%;
+  height: 5px;
+  cursor: pointer;
+}
+input[type=range].volume_bar::-moz-range-thumb {
+  width: 20px;
+  height: 15px;
+  background: rgba(6, 182, 212, 0.93);
+  border: 1px solid #0891b2;
+  border-radius: 50px;
+  cursor: pointer;
+}
+input[type=range].volume_bar::-ms-track {
+  background: transparent;
+  border-color: transparent;
+  border-width: 6.8px 0;
+  color: transparent;
+  width: 100%;
+  height: 5px;
+  cursor: pointer;
+}
+input[type=range].volume_bar::-ms-fill-lower {
+  background: linear-gradient(to bottom right, rgba(236, 72, 153, 1), rgba(59, 130, 246, 1));
+  border: 0;
+  border-radius: 50px;
+}
+input[type=range].volume_bar::-ms-fill-upper {
+  background: linear-gradient(to bottom right, rgba(236, 72, 153, 1), rgba(59, 130, 246, 1));
+
+  border: 0;
+  border-radius: 50px;
+}
+input[type=range].volume_bar::-ms-thumb {
+  width: 20px;
+  height: 15px;
+  background: rgba(6, 182, 212, 0.93);
+  border: 1px solid #0891b2;
+  border-radius: 50px;
+  cursor: pointer;
+  margin-top: 0px;
+  /*Needed to keep the Edge thumb centred*/
+}
+input[type=range].volume_bar:focus::-ms-fill-lower {
+  background: linear-gradient(to bottom right, rgba(236, 72, 153, 1), rgba(59, 130, 246, 1));
+
+}
+input[type=range].volume_bar:focus::-ms-fill-upper {
+  background: linear-gradient(to bottom right, rgba(236, 72, 153, 1), rgba(59, 130, 246, 1));
+}
+/*TODO: Use one of the selectors from https://stackoverflow.com/a/20541859/7077589 and figure out
+how to remove the virtical space around the range input in IE*/
+@supports (-ms-ime-align:auto) {
+  /* Pre-Chromium Edge only styles, selector taken from hhttps://stackoverflow.com/a/32202953/7077589 */
+  input[type=range].volume_bar {
+    margin: 0;
+    /*Edge starts the margin from the thumb, not the track as other browsers do*/
+  }
+}
