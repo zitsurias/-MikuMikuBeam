@@ -10,7 +10,7 @@ function App() {
   const [logs, setLogs] = useState<string[]>([]);
   const [progress, setProgress] = useState(0);
   const [target, setTarget] = useState("");
-  const [attackMethod, setAttackMethod] = useState("http");
+  const [attackMethod, setAttackMethod] = useState("http_flood");
   const [packetSize, setPacketSize] = useState(64);
   const [duration, setDuration] = useState(60);
   const [packetDelay, setPacketDelay] = useState(100);
@@ -94,7 +94,7 @@ function App() {
     setLogs((prev) => [message, ...prev].slice(0, 12));
   };
 
-  const startAttack = () => {
+  const startAttack = (isQuick?: boolean) => {
     if (!target.trim()) {
       alert("Please enter a target!");
       return;
@@ -110,21 +110,24 @@ function App() {
 
     // Play audio
     if (audioRef.current) {
-      audioRef.current.currentTime = 0;
+      audioRef.current.currentTime = isQuick ? 9.5 : 0;
       audioRef.current.play();
     }
 
     // Start attack after audio intro
-    const timeout = setTimeout(() => {
-      setActuallyAttacking(true);
-      socket.emit("startAttack", {
-        target,
-        packetSize,
-        duration,
-        packetDelay,
-        attackMethod,
-      });
-    }, 10250);
+    const timeout = setTimeout(
+      () => {
+        setActuallyAttacking(true);
+        socket.emit("startAttack", {
+          target,
+          packetSize,
+          duration,
+          packetDelay,
+          attackMethod,
+        });
+      },
+      isQuick ? 700 : 10250
+    );
     setCurrentTask(timeout);
   };
 
@@ -175,10 +178,11 @@ function App() {
                 className="px-4 py-2 rounded-lg border border-pink-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none"
                 disabled={isAttacking}
               />
-              <button
-                onClick={isAttacking ? stopAttack : startAttack}
-                className={`
-                  px-8 py-2 rounded-lg font-semibold text-white transition-all
+              <div className="flex gap-2 items-center">
+                <button
+                  onClick={() => (isAttacking ? stopAttack() : startAttack())}
+                  className={`
+                  px-8 py-2 rounded-lg font-semibold text-white transition-all w-full
                   ${
                     isAttacking
                       ? "bg-red-500 hover:bg-red-600"
@@ -186,10 +190,27 @@ function App() {
                   }
                   flex items-center justify-center gap-2
                 `}
-              >
-                <Wand2 className="w-5 h-5" />
-                {isAttacking ? "Stop Beam" : "Start Miku Beam"}
-              </button>
+                >
+                  <Wand2 className="w-5 h-5" />
+                  {isAttacking ? "Stop Beam" : "Start Miku Beam"}
+                </button>
+                <button
+                  onClick={() =>
+                    isAttacking ? stopAttack() : startAttack(true)
+                  }
+                  className={`
+                  px-2 py-2 rounded-lg font-semibold text-white transition-all
+                  ${
+                    isAttacking
+                      ? "bg-gray-500 hover:bg-red-600"
+                      : "bg-cyan-500 hover:bg-cyan-600"
+                  }
+                  flex items-center justify-center gap-2
+                `}
+                >
+                  <Zap className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-4 gap-4">
@@ -203,9 +224,10 @@ function App() {
                   className="w-full px-4 py-2 rounded-lg border border-pink-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none"
                   disabled={isAttacking}
                 >
-                  <option value="http">HTTP</option>
-                  <option value="tcp">TCP</option>
-                  <option value="udp">UDP</option>
+                  <option value="http_flood">HTTP/Flood</option>
+                  <option value="http_slowloris">HTTP/Slowloris</option>
+                  <option value="tcp_flood">TCP/Flood</option>
+                  <option value="minecraft_ping">Minecraft/Ping</option>
                 </select>
               </div>
               <div>

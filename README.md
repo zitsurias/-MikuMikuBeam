@@ -13,7 +13,10 @@ A fun and visually appealing stress testing server with a **Miku-themed** fronte
 - 📊 **Live Stats**: Track the success and failure of each attack in real-time. See how many packets are sent and whether they succeed or fail.
 - 🖼️ **Aesthetic Design**: A visually cute interface to make your experience enjoyable. 🌸
 - 📡 **Attack Methods:**:
-  - `HTTP` - Send HTTP requests
+  - `HTTP Flood` - Send random HTTP requests
+  - `HTTP Slowloris` - Send HTTP requests and keep the connection open
+  - `Minecraft Ping` - Send Minecraft ping/motd requests
+  - `TCP Flood` - Send random TCP packets
 
 ## Setup 🛠️
 
@@ -58,7 +61,7 @@ Make sure you have the following installed:
 Once the server is up and running, you can interact with it via the frontend:
 
 1. **Start Attack**:
-   - Set up the attack parameters: target URL, attack method (HTTP, etc.), packet size, duration, and delay.
+   - Set up the attack parameters: target URL, attack method (HTTP Flood, Slowloris, TCP, etc...), packet size, duration, and delay.
    - Press "Start Attack" to initiate the stress test.
 
 2. **Stop Attack**:
@@ -69,7 +72,7 @@ Once the server is up and running, you can interact with it via the frontend:
 ```json
 {
   "target": "http://example.com",
-  "attackMethod": "http",
+  "attackMethod": "http_flood",
   "packetSize": 512,
   "duration": 60,
   "packetDelay": 500
@@ -83,8 +86,6 @@ Each attack type is handled in a separate worker thread, ensuring that the main 
 ## To-Do 📝
 
 - Add more attack methods:
-  - Minecraft 🎮
-  - TCP 💻
   - UDP 🌐
   - DNS 📡
   - And more! 🔥
@@ -107,12 +108,13 @@ For example:
 
 ```javascript
 const attackHandlers = {
-  http: "./workers/httpAttack.js",
-  minecraft: "./workers/minecraftAttack.js",
-  udp: "./workers/udpAttack.js",
-  tcp: "./workers/tcpAttack.js",
-  dns: "./workers/dnsAttack.js",
+  http_flood: "./workers/httpFloodAttack.js",
+  http_slowloris: "./workers/httpSlowlorisAttack.js",
+  tcp_flood: "./workers/tcpFloodAttack.js",
+  minecraft_ping: "./workers/minecraftPingAttack.js",
+
   // Add more protocols as needed!
+  your_protocol: "./workers/yourProtocolAttack.js"
 };
 ```
 

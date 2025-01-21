@@ -1,12 +1,14 @@
 import fs from "fs";
 import { join } from "path";
 
+import { Proxy } from "./lib";
+
 const currentPath = () => {
   const path = process.cwd();
   return path === "/" ? "." : path;
 };
 
-const loadFileLines = (filePath) => {
+const loadFileLines = (filePath: string) => {
   try {
     return fs
       .readFileSync(filePath, "utf8")
@@ -24,11 +26,11 @@ export function loadUserAgents() {
   return loadFileLines(join(currentPath(), "data/uas.txt"));
 }
 
-export function loadProxies() {
+export function loadProxies(): Proxy[] {
   const lines = loadFileLines(join(currentPath(), "data/proxies.txt"));
   return lines.map((line) => {
     const [protocol, addr] = line.split("://");
     const [host, port] = addr.split(":");
-    return { protocol, host, port };
+    return { protocol, host, port: parseInt(port) };
   });
 }

