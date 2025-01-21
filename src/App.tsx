@@ -22,6 +22,7 @@ function App() {
   const [lastUpdatedPPS, setLastUpdatedPPS] = useState(Date.now());
   const [lastTotalPackets, setLastTotalPackets] = useState(0);
   const [currentTask, setCurrentTask] = useState<NodeJS.Timeout | null>(null);
+  const [audioVol, setAudioVol] = useState(100);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
@@ -90,6 +91,14 @@ function App() {
     };
   }, []);
 
+  
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = audioVol / 100;
+    }
+  }, [audioVol])
+ 
+
   const addLog = (message: string) => {
     setLogs((prev) => [message, ...prev].slice(0, 12));
   };
@@ -111,6 +120,7 @@ function App() {
     // Play audio
     if (audioRef.current) {
       audioRef.current.currentTime = isQuick ? 9.5 : 0;
+      audioRef.current.volume = audioVol / 100;
       audioRef.current.play();
     }
 
@@ -146,7 +156,7 @@ function App() {
 
       <div className="max-w-2xl mx-auto space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-pink-500 mb-2">
+          <h1 className="mb-2 text-4xl font-bold text-pink-500">
             Miku Miku Beam
           </h1>
           <p className="text-gray-600">
@@ -155,10 +165,10 @@ function App() {
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-xl p-6 relative overflow-hidden">
+        <div className="relative p-6 overflow-hidden bg-white rounded-lg shadow-xl">
           {/* Miku GIF */}
           <div
-            className="flex justify-center mb-6 h-48 w-full"
+            className="flex justify-center w-full h-48 mb-6"
             style={{
               backgroundImage: "url('/miku.gif')",
               backgroundRepeat: "no-repeat",
@@ -175,10 +185,10 @@ function App() {
                 value={target}
                 onChange={(e) => setTarget(e.target.value)}
                 placeholder="Enter target URL or IP"
-                className="px-4 py-2 rounded-lg border border-pink-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none"
+                className="px-4 py-2 border border-pink-200 rounded-lg outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
                 disabled={isAttacking}
               />
-              <div className="flex gap-2 items-center">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => (isAttacking ? stopAttack() : startAttack())}
                   className={`
@@ -215,13 +225,13 @@ function App() {
 
             <div className="grid grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block mb-1 text-sm font-medium text-gray-700">
                   Attack Method
                 </label>
                 <select
                   value={attackMethod}
                   onChange={(e) => setAttackMethod(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg border border-pink-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none"
+                  className="w-full px-4 py-2 border border-pink-200 rounded-lg outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
                   disabled={isAttacking}
                 >
                   <option value="http_flood">HTTP/Flood</option>
@@ -231,42 +241,42 @@ function App() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block mb-1 text-sm font-medium text-gray-700">
                   Packet Size (kb)
                 </label>
                 <input
                   type="number"
                   value={packetSize}
                   onChange={(e) => setPacketSize(Number(e.target.value))}
-                  className="w-full px-4 py-2 rounded-lg border border-pink-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none"
+                  className="w-full px-4 py-2 border border-pink-200 rounded-lg outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
                   disabled={isAttacking}
                   min="1"
                   max="1500"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block mb-1 text-sm font-medium text-gray-700">
                   Duration (seconds)
                 </label>
                 <input
                   type="number"
                   value={duration}
                   onChange={(e) => setDuration(Number(e.target.value))}
-                  className="w-full px-4 py-2 rounded-lg border border-pink-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none"
+                  className="w-full px-4 py-2 border border-pink-200 rounded-lg outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
                   disabled={isAttacking}
                   min="1"
                   max="300"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block mb-1 text-sm font-medium text-gray-700">
                   Packet Delay (ms)
                 </label>
                 <input
                   type="number"
                   value={packetDelay}
                   onChange={(e) => setPacketDelay(Number(e.target.value))}
-                  className="w-full px-4 py-2 rounded-lg border border-pink-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none"
+                  className="w-full px-4 py-2 border border-pink-200 rounded-lg outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
                   disabled={isAttacking}
                   min="1"
                   max="1000"
@@ -277,8 +287,8 @@ function App() {
 
           {/* Stats Widgets */}
           <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-gradient-to-br from-pink-500/10 to-blue-500/10 p-4 rounded-lg">
-              <div className="flex items-center gap-2 text-pink-600 mb-2">
+            <div className="p-4 rounded-lg bg-gradient-to-br from-pink-500/10 to-blue-500/10">
+              <div className="flex items-center gap-2 mb-2 text-pink-600">
                 <Zap className="w-4 h-4" />
                 <span className="font-semibold">Packets/sec</span>
               </div>
@@ -286,8 +296,8 @@ function App() {
                 {stats.pps.toLocaleString()}
               </div>
             </div>
-            <div className="bg-gradient-to-br from-pink-500/10 to-blue-500/10 p-4 rounded-lg">
-              <div className="flex items-center gap-2 text-pink-600 mb-2">
+            <div className="p-4 rounded-lg bg-gradient-to-br from-pink-500/10 to-blue-500/10">
+              <div className="flex items-center gap-2 mb-2 text-pink-600">
                 <Bot className="w-4 h-4" />
                 <span className="font-semibold">Active Bots</span>
               </div>
@@ -295,8 +305,8 @@ function App() {
                 {stats.bots.toLocaleString()}
               </div>
             </div>
-            <div className="bg-gradient-to-br from-pink-500/10 to-blue-500/10 p-4 rounded-lg">
-              <div className="flex items-center gap-2 text-pink-600 mb-2">
+            <div className="p-4 rounded-lg bg-gradient-to-br from-pink-500/10 to-blue-500/10">
+              <div className="flex items-center gap-2 mb-2 text-pink-600">
                 <Wifi className="w-4 h-4" />
                 <span className="font-semibold">Total Packets</span>
               </div>
@@ -307,15 +317,15 @@ function App() {
           </div>
 
           {/* Progress Bar */}
-          <div className="bg-gray-200 rounded-full h-4 mb-6 overflow-hidden">
+          <div className="h-4 mb-6 overflow-hidden bg-gray-200 rounded-full">
             <div
-              className="h-full bg-gradient-to-r from-pink-500 to-blue-500 transition-all duration-500"
+              className="h-full transition-all duration-500 bg-gradient-to-r from-pink-500 to-blue-500"
               style={{ width: `${progress}%` }}
             />
           </div>
 
           {/* Logs Section */}
-          <div className="bg-gray-900 rounded-lg p-4 font-mono text-sm">
+          <div className="p-4 font-mono text-sm bg-gray-900 rounded-lg">
             <div className="text-green-400">
               {logs.map((log, index) => (
                 <div key={index} className="py-1">
@@ -323,7 +333,7 @@ function App() {
                 </div>
               ))}
               {logs.length === 0 && (
-                <div className="text-gray-500 italic">
+                <div className="italic text-gray-500">
                   {">"} Waiting for Miku's power...
                 </div>
               )}
@@ -334,14 +344,15 @@ function App() {
           {isAttacking && (
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-blue-500/10 animate-pulse" />
-              <div className="absolute top-0 left-1/2 -translate-x-1/2">
+              <div className="absolute top-0 -translate-x-1/2 left-1/2">
                 <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce" />
               </div>
             </div>
           )}
         </div>
 
-        <div className="text-center text-sm text-gray-500">
+        <div className="flex flex-col items-center">
+          <span className="text-sm text-center text-gray-500"> 
           🎵 v1.0 made by{" "}
           <a
             href="https://github.com/sammwyy/mikumikubeam"
@@ -351,6 +362,10 @@ function App() {
             @Sammwy
           </a>{" "}
           🎵
+          </span>
+          <span>
+          <input type="range" min="0" max="100" step="5" draggable="false" value={audioVol} onChange={(e) => setAudioVol(parseInt(e.target?.value))} />
+          </span>
         </div>
       </div>
     </div>
